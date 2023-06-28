@@ -49,6 +49,7 @@ app.post('/api/v1/tours', (req, res) => {
   );
 });
 
+// doesnt really update anything, this is just to demonstrate the logic
 app.patch('/api/v1/tours/:id', (req, res) => {
   const id = req.params.id * 1;
   if (id > tours.length) {
@@ -74,6 +75,19 @@ app.get('/api/v1/tours/:id', (req, res) => {
     return res.status(404).json({ status: 'failed', message: 'invalid Id' });
   }
   res.status(200).json({ status: 'success', data: { tour: tour } });
+});
+
+// doesnt really delete anything, this is just to demonstrate the logic
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+  const id = req.params.id * 1;
+  if (id > tours.length) {
+    return res.status(404).json({ status: 'failed', message: 'invalid Id' });
+  }
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
 });
 
 const port = 3000;
