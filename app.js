@@ -1,7 +1,12 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
+
+// 1) MIDDELEWARES
+
+app.use(morgan('dev'));
 
 // This is a middleware, a function that can modifiy the incoming data
 // It is needed to get access to the req.body from the POST request
@@ -20,6 +25,8 @@ app.use((req, res, next) => {
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
+
+// 2) ROUTE HANDLERS
 
 const getAllTours = (req, res) => {
   console.log(req.requestTime);
@@ -89,13 +96,7 @@ const deleteTour = (req, res) => {
   });
 };
 
-// app.get('/api/v1/tours', getAllTours);
-// app.get('/api/v1/tours/:id', getTour);
-// app.post('/api/v1/tours', createTour);
-// // doesnt really update anything, this is just to demonstrate the logic
-// app.patch('/api/v1/tours/:id', updateTour);
-// // doesnt really delete anything, this is just to demonstrate the logic
-// app.delete('/api/v1/tours/:id', deleteTour);
+// 3) ROUTES
 
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
@@ -104,6 +105,8 @@ app
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+// 4) SERVER START
 
 const port = 3000;
 app.listen(port, () => {
