@@ -49,6 +49,20 @@ app.post('/api/v1/tours', (req, res) => {
   );
 });
 
+app.get('/api/v1/tours/:id', (req, res) => {
+  console.log(req.params);
+
+  // callback function used with the find function will return
+  // the only element that match req.params (so the id present in the url)
+  // JS trick : multiply a string that looks like a number will automatically convert it to a number
+  const id = req.params.id * 1;
+  const tour = tours.find((el) => el.id === id);
+  if (!tour) {
+    return res.status(404).json({ status: 'failed', message: 'invalid Id' });
+  }
+  res.status(200).json({ status: 'success', data: { tour: tour } });
+});
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
