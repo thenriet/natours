@@ -8,17 +8,16 @@ const app = express();
 
 // 1) MIDDELEWARES
 
-app.use(morgan('dev'));
-
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 // This is a middleware, a function that can modifiy the incoming data
 // It is needed to get access to the req.body from the POST request
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 // Custom middleware that will apply to every request
 app.use((req, res, next) => {
   console.log('Hello from the middleware');
   next();
 });
-
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
