@@ -12,6 +12,16 @@ exports.checkId = (req, res, next, val) => {
   next();
 };
 
+exports.checkBody = (req, res, next) => {
+  console.log('Check body is called');
+  if (!req.body.name || !req.body.price) {
+    return res
+      .status(400)
+      .json({ status: 'failed', message: 'Missing name or price' });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
   res.status(200).json({
