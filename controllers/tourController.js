@@ -4,6 +4,14 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkId = (req, res, next, val) => {
+  console.log(`Tour id is: ${val}`);
+  if (val > tours.length) {
+    return res.status(404).json({ status: 'failed', message: 'invalid Id' });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
   res.status(200).json({
@@ -20,9 +28,7 @@ exports.getTour = (req, res) => {
   // JS trick : multiply a string that looks like a number will automatically convert it to a number
   const id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    return res.status(404).json({ status: 'failed', message: 'invalid id' });
-  }
+
   res.status(200).json({ status: 'success', data: { tour: tour } });
 };
 
@@ -50,9 +56,7 @@ exports.createTour = (req, res) => {
 
 exports.updateTour = (req, res) => {
   const id = req.params.id * 1;
-  if (id > tours.length) {
-    return res.status(404).json({ status: 'failed', message: 'invalid Id' });
-  }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -63,9 +67,7 @@ exports.updateTour = (req, res) => {
 
 exports.deleteTour = (req, res) => {
   const id = req.params.id * 1;
-  if (id > tours.length) {
-    return res.status(404).json({ status: 'failed', message: 'invalid Id' });
-  }
+
   res.status(204).json({
     status: 'success',
     data: null,
