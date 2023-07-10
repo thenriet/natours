@@ -12,6 +12,7 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
+    autoIndex: true,
   })
   .then(() => {
     console.log('DB connection established');
@@ -20,6 +21,19 @@ mongoose
 console.log(app.get('env'));
 // environment variables made by node.js
 // console.log(process.env);
+
+// const testTour = new Tour({
+//   name: 'The Park Camper',
+//   rating: 4.7,
+//   price: 497,
+// });
+
+// testTour
+//   .save()
+//   .then((doc) => {
+//     console.log(doc);
+//   })
+//   .catch((err) => console.log('ERROR :', err));
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
