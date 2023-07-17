@@ -1,5 +1,8 @@
 // const fs = require('fs');
 const Tour = require('./../models/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
+
+//////////////////////////////// OLD SYSTEM //////////////////////////////////
 
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -34,51 +37,52 @@ exports.aliasTopTours = async (req, res, next) => {
 };
 
 // Get all tours query
+
 exports.getAllTours = async (req, res) => {
   try {
     /////// BUILD THE QUERY //////
     // 1A) Filtering
-    const queryObj = { ...req.query }; // creates a new object with the properties from req.query
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
-    console.log(req.query, queryObj);
+    // const queryObj = { ...req.query }; // creates a new object with the properties from req.query
+    // const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    // excludedFields.forEach((el) => delete queryObj[el]);
+    // console.log(req.query, queryObj);
 
-    // 1B) Advanced Filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    console.log(JSON.parse(queryStr));
+    // // 1B) Advanced Filtering
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    // console.log(JSON.parse(queryStr));
 
-    let query = Tour.find(JSON.parse(queryStr));
+    // let query = Tour.find(JSON.parse(queryStr));
 
-    // 2) Sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      console.log(sortBy);
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
+    // // 2) Sorting
+    // if (req.query.sort) {
+    //   const sortBy = req.query.sort.split(',').join(' ');
+    //   console.log(sortBy);
+    //   query = query.sort(sortBy);
+    // } else {
+    //   query = query.sort('-createdAt');
+    // }
 
-    // 3) Field limiting
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v'); // excludes __v in the response
-    }
+    // // 3) Field limiting
+    // if (req.query.fields) {
+    //   const fields = req.query.fields.split(',').join(' ');
+    //   query = query.select(fields);
+    // } else {
+    //   query = query.select('-__v'); // excludes __v in the response
+    // }
 
-    // 4) Pagination
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
+    // // 4) Pagination
+    // const page = req.query.page * 1 || 1;
+    // const limit = req.query.limit * 1 || 100;
+    // const skip = (page - 1) * limit;
 
-    // page=2&limit=10, 1-10 on page 1 and 11-20 on page 2, etc
-    query = query.skip(skip).limit(limit);
+    // // page=2&limit=10, 1-10 on page 1 and 11-20 on page 2, etc
+    // query = query.skip(skip).limit(limit);
 
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip >= numTours) throw new Error('This page does not exist');
-    }
+    // if (req.query.page) {
+    //   const numTours = await Tour.countDocuments();
+    //   if (skip >= numTours) throw new Error('This page does not exist');
+    // }
 
     // const query = Tour.find()
     //   .where('duration')
@@ -91,7 +95,12 @@ exports.getAllTours = async (req, res) => {
     // lte = lesser or equal, lt = lesser than
 
     /////// EXECUTE THE QUERY //////
-    const tours = await query;
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
     // query.sort().select().skip().limit()
 
     ///// SEND RESPONSE /////
@@ -104,7 +113,7 @@ exports.getAllTours = async (req, res) => {
   } catch (err) {
     res
       .status(400)
-      .json({ status: 'fail', message: 'Something went wrong' + err });
+      .json({ status: 'fail', message: 'Something went wrong' + err.message });
   }
 };
 
